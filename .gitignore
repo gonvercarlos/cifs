@@ -1,0 +1,21 @@
+# Environment variables
+.env
+
+# Log files
+*.log
+/tmp/*.log
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# PHP
+vendor/
+composer.lock
