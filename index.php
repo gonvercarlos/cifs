@@ -144,8 +144,8 @@ if ($page > $total_pages) $page = $total_pages;
 
 function build_url($overrides = array()) {
     $params = array_merge($_GET, $overrides);
-    $base = BASE_PATH . '/';
-    return $base . '?' . http_build_query($params);
+    // Use relative URL for query parameters to avoid duplication with reverse proxy
+    return '?' . http_build_query($params);
 }
 ?>
 <!DOCTYPE html>
@@ -193,7 +193,7 @@ h1{ color:var(--black); }
 
   <div>
     <div class="search">
-      <form method="get" action="<?php echo htmlspecialchars(BASE_PATH . '/', ENT_QUOTES, 'UTF-8'); ?>">
+      <form method="get" action="">
         <input type="text" name="q" placeholder="Buscar cliente, CIF o razón social" value="<?php echo htmlspecialchars($q, ENT_QUOTES, 'UTF-8'); ?>">
         <select name="per_page">
           <option value="100"<?php echo $per_page === '100' ? ' selected' : ''; ?>>100</option>
@@ -269,7 +269,7 @@ if (!$is_all && $total_pages > 1) {
 }
 ?>
   <div style="margin-left:12px;">
-    <form style="display:inline;" method="get" action="<?php echo htmlspecialchars(BASE_PATH . '/', ENT_QUOTES, 'UTF-8'); ?>">
+    <form style="display:inline;" method="get" action="">
       <input type="hidden" name="q" value="<?php echo htmlspecialchars($q, ENT_QUOTES, 'UTF-8'); ?>">
       <label class="small">Mostrar:</label>
       <select name="per_page" onchange="this.form.submit()">
@@ -288,7 +288,7 @@ if (!$is_all && $total_pages > 1) {
   <div class="modal" id="modal">
     <h3 id="modal-title">Título</h3>
     <!-- action.php procesará add/edit/delete -->
-    <form id="modal-form" method="post" action="<?php echo htmlspecialchars(BASE_PATH . '/action.php', ENT_QUOTES, 'UTF-8'); ?>">
+    <form id="modal-form" method="post" action="action.php">
       <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
       <input type="hidden" name="action" id="form-action" value="">
       <input type="hidden" name="client_id" id="form-client-id" value="">
