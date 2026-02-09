@@ -288,7 +288,7 @@ if (!$is_all && $total_pages > 1) {
   <div class="modal" id="modal">
     <h3 id="modal-title">Título</h3>
     <!-- action.php procesará add/edit/delete -->
-    <form id="modal-form" method="post" action="action.php">
+    <form id="modal-form" method="post" action="<?php echo BASE_PATH; ?>/action.php">
       <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
       <input type="hidden" name="action" id="form-action" value="">
       <input type="hidden" name="client_id" id="form-client-id" value="">

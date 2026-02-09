@@ -11,7 +11,8 @@ function write_debug_log($text) {
 // CSRF check
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     http_response_code(400);
-    echo "<h2>Error</h2><p>Petición inválida (CSRF).</p><p><a href=\"./\">Volver</a></p>";
+    $back_url = BASE_PATH ? BASE_PATH . '/' : './';
+    echo "<h2>Error</h2><p>Petición inválida (CSRF).</p><p><a href=\"{$back_url}\">Volver</a></p>";
     write_debug_log("CSRF FAIL - POST: ".json_encode($_POST));
     exit;
 }
@@ -40,7 +41,8 @@ try {
         $stmt2->bindValue(':cif_id',$newId,PDO::PARAM_INT);
         $stmt2->execute();
         $pdo->commit();
-        header("Location: ./");
+        $redirect_url = BASE_PATH ? BASE_PATH . '/' : './';
+        header("Location: {$redirect_url}");
         exit;
 
     } elseif ($action === 'edit') {
@@ -54,7 +56,8 @@ try {
         $stmt->bindValue(':entidad',$entidad,PDO::PARAM_STR);
         $stmt->bindValue(':id',$cif_id,PDO::PARAM_INT);
         $stmt->execute();
-        header("Location: ./");
+        $redirect_url = BASE_PATH ? BASE_PATH . '/' : './';
+        header("Location: {$redirect_url}");
         exit;
 
     } elseif ($action === 'delete') {
@@ -97,7 +100,8 @@ try {
         }
 
         $pdo->commit();
-        header("Location: ./");
+        $redirect_url = BASE_PATH ? BASE_PATH . '/' : './';
+        header("Location: {$redirect_url}");
         exit;
     } else {
         throw new Exception("Acción no reconocida.");
@@ -108,6 +112,7 @@ try {
     }
     $msg = $e->getMessage();
     write_debug_log("ERROR action={$action} - " . $msg . " - POST: " . json_encode($_POST));
-    echo "<h2>Error</h2><p>" . h($msg) . "</p><p><a href=\"./\">Volver</a></p>";
+    $back_url = BASE_PATH ? BASE_PATH . '/' : './';
+    echo "<h2>Error</h2><p>" . h($msg) . "</p><p><a href=\"{$back_url}\">Volver</a></p>";
     exit;
 }
