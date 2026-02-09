@@ -84,11 +84,14 @@ The application connects to a PostgreSQL database. Connection parameters are con
 Environment variables are configured in the `.env` file (gitignored) or passed through Docker.
 
 ### BASE_PATH Configuration
-The application supports running in a subdirectory via the `BASE_PATH` environment variable:
-- If running at root (e.g., `http://domain.com/`), leave `BASE_PATH` empty
-- If running in a subdirectory (e.g., `http://domain.com/cifs/`), set `BASE_PATH=/cifs`
+The application supports running in a subdirectory via the `BASE_PATH` environment variable for database connection and session management.
 
-All URLs, form actions, and redirects use the `BASE_PATH` constant defined in config.php.
+**Important**: The application uses **relative URLs** for all form actions, redirects, and navigation to ensure compatibility with reverse proxies (like Nginx Proxy Manager). This prevents path duplication issues (e.g., `/cifs/cifs/`) that can occur when using absolute paths behind a reverse proxy.
+
+All internal navigation uses relative paths:
+- Form actions: `action="action.php"`
+- Redirects: `Location: index.php`
+- Pagination: `?page=2` (relative query strings)
 
 ### Debug Mode
 action.php currently runs in debug mode for delete operations:
