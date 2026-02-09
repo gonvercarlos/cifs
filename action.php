@@ -8,15 +8,29 @@ function write_debug_log($text) {
     @file_put_contents('/tmp/cif_debug.log', "[".date('Y-m-d H:i:s')."] ".$text.PHP_EOL, FILE_APPEND);
 }
 
+// Get the correct redirect URL based on the script directory
+function get_redirect_url() {
+    // Get the directory of the current script (e.g., /cifs if script is /cifs/action.php)
+    $script_dir = dirname($_SERVER['SCRIPT_NAME']);
+    // Ensure it ends with a slash
+    if ($script_dir === '/' || $script_dir === '\\') {
+        return '/';
+    }
+    return $script_dir . '/';
+}
+
 // CSRF check
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     http_response_code(400);
-    echo "<h2>Error</h2><p>Petición inválida (CSRF).</p><p><a href=\"index.php\">Volver</a></p>";
+    echo "<h2>Error</h2><p>Petición inválida (CSRF).</p><p><a href=\"" . get_redirect_url() . "\">Volver</a></p>";
     write_debug_log("CSRF FAIL - POST: ".json_encode($_POST));
     exit;
 }
 
 $action = isset($_POST['action']) ? $_POST['action'] : '';
+
+// Log server variables for debugging redirect issues
+write_debug_log("SERVER VARS - SCRIPT_NAME: {$_SERVER['SCRIPT_NAME']}, REQUEST_URI: {$_SERVER['REQUEST_URI']}, HTTP_HOST: {$_SERVER['HTTP_HOST']}");
 
 try {
     write_debug_log("ACTION: {$action} - POST: " . json_encode($_POST));
@@ -40,7 +54,9 @@ try {
         $stmt2->bindValue(':cif_id',$newId,PDO::PARAM_INT);
         $stmt2->execute();
         $pdo->commit();
-        header("Location: index.php");
+        $redirect = get_redirect_url();
+        write_debug_log("ADD SUCCESS - Redirecting to: {$redirect} (SCRIPT_NAME: {$_SERVER['SCRIPT_NAME']})");
+        header("Location: " . $redirect);
         exit;
 
     } elseif ($action === 'edit') {
@@ -54,7 +70,9 @@ try {
         $stmt->bindValue(':entidad',$entidad,PDO::PARAM_STR);
         $stmt->bindValue(':id',$cif_id,PDO::PARAM_INT);
         $stmt->execute();
-        header("Location: index.php");
+        $redirect = get_redirect_url();
+        write_debug_log("EDIT SUCCESS - Redirecting to: {$redirect} (SCRIPT_NAME: {$_SERVER['SCRIPT_NAME']})");
+        header("Location: " . $redirect);
         exit;
 
     } elseif ($action === 'delete') {
@@ -97,7 +115,9 @@ try {
         }
 
         $pdo->commit();
-        header("Location: index.php");
+        $redirect = get_redirect_url();
+        write_debug_log("DELETE SUCCESS - Redirecting to: {$redirect} (SCRIPT_NAME: {$_SERVER['SCRIPT_NAME']})");
+        header("Location: " . $redirect);
         exit;
     } else {
         throw new Exception("Acción no reconocida.");
@@ -108,6 +128,6 @@ try {
     }
     $msg = $e->getMessage();
     write_debug_log("ERROR action={$action} - " . $msg . " - POST: " . json_encode($_POST));
-    echo "<h2>Error</h2><p>" . h($msg) . "</p><p><a href=\"index.php\">Volver</a></p>";
+    echo "<h2>Error</h2><p>" . h($msg) . "</p><p><a href=\"" . get_redirect_url() . "\">Volver</a></p>";
     exit;
 }
