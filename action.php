@@ -8,18 +8,15 @@ function write_debug_log($text) {
     @file_put_contents('/tmp/cif_debug.log', "[".date('Y-m-d H:i:s')."] ".$text.PHP_EOL, FILE_APPEND);
 }
 
-// Get redirect URL - use referer if available, otherwise index.php
+// Get redirect URL - always return to /cifs/
 function get_redirect_url() {
-    if (isset($_SERVER['HTTP_REFERER']) && !empty($_SERVER['HTTP_REFERER'])) {
-        return $_SERVER['HTTP_REFERER'];
-    }
-    return 'index.php';
+    return '/cifs/';
 }
 
 // CSRF check
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     http_response_code(400);
-    echo "<h2>Error</h2><p>Petición inválida (CSRF).</p><p><a href=\"index.php\">Volver</a></p>";
+    echo "<h2>Error</h2><p>Petición inválida (CSRF).</p><p><a href=\"/cifs/\">Volver</a></p>";
     write_debug_log("CSRF FAIL - POST: ".json_encode($_POST));
     exit;
 }
@@ -122,6 +119,6 @@ try {
     }
     $msg = $e->getMessage();
     write_debug_log("ERROR action={$action} - " . $msg . " - POST: " . json_encode($_POST));
-    echo "<h2>Error</h2><p>" . h($msg) . "</p><p><a href=\"index.php\">Volver</a></p>";
+    echo "<h2>Error</h2><p>" . h($msg) . "</p><p><a href=\"/cifs/\">Volver</a></p>";
     exit;
 }
